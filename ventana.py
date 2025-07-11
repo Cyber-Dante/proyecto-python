@@ -2,7 +2,45 @@ from tkinter import *
 
 root = Tk()
 root.title("Formulario de roles")
-root.geometry("350x400")
+root.geometry("400x550")
+
+# ---------- congregacion ----------
+# Opciones de la lista
+opciones = ["Congregación A", "Congregación B", "Congregación C"]
+
+# Variable para almacenar la selección
+congregacion = StringVar()
+
+# Crear Combobox
+combo = ttk.Combobox(root, textvariable=congregacion, state="readonly")
+combo['values'] = opciones
+combo.set("Elija una congregación")  # Placeholder simulado
+combo.pack(pady=20)
+
+# Función para verificar la selección
+def verificar():
+    seleccion = congregacion.get()
+    if seleccion == "Elija una congregación":
+        print("Por favor, elija una opción válida.")
+    else:
+        print("Seleccionaste:", seleccion)
+
+Button(root, text="Aceptar", command=verificar).pack()
+
+# ---------- Inputs para nombre y apellido ----------
+Label   (root, text="Nombre:", font=("Arial", 12)).pack(anchor="w", padx=10, pady=(10, 0))
+Entry(root).pack(anchor="w", padx=20)
+Label(root, text="Apellido:", font=("Arial", 12)).pack(anchor="w", padx=10, pady=(10, 0))
+Entry(root).pack(anchor="w", padx=20)
+
+# ---------- Inputs para fecha de nacimiento ----------
+Label(root, text="Fecha de nacimiento:", font=("Arial", 12)).pack(anchor="w", padx=10, pady=(10, 0))
+Entry(root).pack(anchor="w", padx=20)
+
+# ---------- Inputs para fecha de bautismo ----------
+Label(root, text="Fecha de bautismo:", font=("Arial", 12)).pack(anchor="w", padx=10, pady=(10, 0))
+Entry(root).pack(anchor="w", padx=20)
+
 
 # ---------- Variables ----------
 sexo = StringVar(value="Mujer")  # Por defecto
@@ -88,7 +126,7 @@ def validar_si_precursor_auxiliar():
 
 # ---------- Interfaz ----------
 
-Label(root, text="Seleccione sexo:", font=("Arial", 12)).pack(anchor="w", padx=10, pady=(10, 0))
+Label(root, text="Seleccione género:", font=("Arial", 12)).pack(anchor="w", padx=10, pady=(10, 0))
 
 frame_radio = Frame(root)
 frame_radio.pack(anchor="w", padx=20)
