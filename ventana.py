@@ -1,21 +1,60 @@
 from tkinter import *
+from tkinter import ttk
+from tkcalendar import DateEntry
 
 root = Tk()
 root.title("Formulario de roles")
-root.geometry("400x550")
+root.geometry("700x700")
+
+# ---------- variable global ----------
+datos_publicador = {
+    "nombre": StringVar(),
+    "apellido": StringVar(),
+    "fecha_bautismo": StringVar(),
+    "genero": StringVar(),
+    "privilegio": StringVar(),
+    "congregacion": StringVar()
+}
+
+
+# Grid 2 rows 2 cols
+frame_A = Frame(root, borderwidth=1, relief="solid")
+frame_B = Frame(root, borderwidth=1, relief="solid")
+frame_C = Frame(root, borderwidth=1, relief="solid")
+frame_D = Frame(root, borderwidth=1, relief="solid")
+
+frame_A.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
+frame_B.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
+frame_C.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
+frame_D.grid(row=1, column=1, sticky="nsew", padx=5, pady=5)
+
+root.grid_rowconfigure(0, weight=1)
+root.grid_rowconfigure(1, weight=1)
+root.grid_columnconfigure(0, weight=1)
+root.grid_columnconfigure(1, weight=1)
+
+Label(frame_A, text="Nombre:").grid(row=0, column=0)
+Entry(frame_A, textvariable=datos_publicador["nombre"]).grid(row=0, column=1)
+
+Label(frame_A, text="Apellido:").grid(row=1, column=0)
+Entry(frame_A, textvariable=datos_publicador["apellido"]).grid(row=1, column=1)
+
+Label(frame_A, text="Fecha de bautismo:").grid(row=2, column=0)
+fecha_bautismo = DateEntry(frame_A, selectmode='BROWSE', date_pattern='dd/mm/yyyy', locale="es_AR", width=20, textvariable=datos_publicador["fecha_bautismo"])
+fecha_bautismo.grid(row=2, column=1)
 
 # ---------- congregacion ----------
 # Opciones de la lista
-opciones = ["Congregación A", "Congregación B", "Congregación C"]
+opciones = ["Congregación Media Agua", "Congregación Santa Rosa ", "Congregación Pocitos", "Congregacion centro"]
 
 # Variable para almacenar la selección
 congregacion = StringVar()
 
-# Crear Combobox
+# Crear Combobox col2 row1
 combo = ttk.Combobox(root, textvariable=congregacion, state="readonly")
 combo['values'] = opciones
 combo.set("Elija una congregación")  # Placeholder simulado
-combo.pack(pady=20)
+combo.grid(row=0, column=1, pady=3)
 
 # Función para verificar la selección
 def verificar():
@@ -23,27 +62,19 @@ def verificar():
     if seleccion == "Elija una congregación":
         print("Por favor, elija una opción válida.")
     else:
-        print("Seleccionaste:", seleccion)
-
-Button(root, text="Aceptar", command=verificar).pack()
+        datos_publicador["congregacion"] = seleccion
 
 # ---------- Inputs para nombre y apellido ----------
-Label   (root, text="Nombre:", font=("Arial", 12)).pack(anchor="w", padx=10, pady=(10, 0))
-Entry(root).pack(anchor="w", padx=20)
-Label(root, text="Apellido:", font=("Arial", 12)).pack(anchor="w", padx=10, pady=(10, 0))
-Entry(root).pack(anchor="w", padx=20)
+Label(frame_A, text="Nombre:", font=("Arial", 12)).grid(row=0, column=0, pady=3)
+Entry(frame_A, textvariable=datos_publicador["nombre"]).grid(row=0, column=1, pady=3)
+Label(frame_A, text="Apellido:", font=("Arial", 12)).grid(row=1, column=0, pady=3)
+Entry(frame_A, textvariable=datos_publicador["apellido"]).grid(row=1, column=1, pady=3)
 
-# ---------- Inputs para fecha de nacimiento ----------
-Label(root, text="Fecha de nacimiento:", font=("Arial", 12)).pack(anchor="w", padx=10, pady=(10, 0))
-Entry(root).pack(anchor="w", padx=20)
-
-# ---------- Inputs para fecha de bautismo ----------
-Label(root, text="Fecha de bautismo:", font=("Arial", 12)).pack(anchor="w", padx=10, pady=(10, 0))
-Entry(root).pack(anchor="w", padx=20)
-
+def fecha_bautismo():
+    datos_publicador["fecha_bautismo"] = fecha_bautismo.get_date()
 
 # ---------- Variables ----------
-sexo = StringVar(value="Mujer")  # Por defecto
+genero = StringVar(value="Mujer")  # Por defecto
 roles = {
     "Publicador no bautizado": IntVar(),
     "Publicador bautizado": IntVar(),
@@ -62,11 +93,12 @@ def actualizar_roles():
         validar_publicador_conflictos()
         return
 
-    if sexo.get() == "Mujer":
+    if genero.get() == "Hombre":
         checkboxes["Siervo ministerial"].config(state="disabled")
         checkboxes["Anciano"].config(state="disabled")
         roles["Siervo ministerial"].set(0)
         roles["Anciano"].set(0)
+        datos_publicador["genero"] = "Hombre"
     else:
         checkboxes["Siervo ministerial"].config(state="normal")
         checkboxes["Anciano"].config(state="normal")
@@ -83,13 +115,14 @@ def validar_publicador_conflictos():
             if key != "Publicador no bautizado":
                 checkboxes[key].config(state="disabled")
                 roles[key].set(0)
+                datos_publicador[key] = 0
     else:
         # Rehabilitar checkboxes según condiciones
         checkboxes["Publicador bautizado"].config(state="normal")
         checkboxes["Precursor auxiliar"].config(state="normal")
         checkboxes["Precursor regular"].config(state="normal")
 
-        if sexo.get() == "Hombre":
+        if genero.get() == "Hombre":
             checkboxes["Siervo ministerial"].config(state="normal")
             checkboxes["Anciano"].config(state="normal")
         else:
@@ -108,7 +141,7 @@ def validar_rol_exclusivo():
         checkboxes["Siervo ministerial"].config(state="disabled")
         roles["Siervo ministerial"].set(0)
     else:
-        if sexo.get() == "Hombre" and roles["Publicador no bautizado"].get() == 0:
+        if genero.get() == "Hombre" and roles["Publicador no bautizado"].get() == 0:
             checkboxes["Siervo ministerial"].config(state="normal")
             checkboxes["Anciano"].config(state="normal")
 
@@ -126,18 +159,23 @@ def validar_si_precursor_auxiliar():
 
 # ---------- Interfaz ----------
 
-Label(root, text="Seleccione género:", font=("Arial", 12)).pack(anchor="w", padx=10, pady=(10, 0))
-
+Label(root, text="Seleccione género:", font=("Arial", 12)).grid(row=1, column=0, pady=3)
 frame_radio = Frame(root)
-frame_radio.pack(anchor="w", padx=20)
+frame_radio.grid(row=1, column=1, pady=3)
 
-Radiobutton(frame_radio, text="Hombre", variable=sexo, value="Hombre", command=actualizar_roles).pack(anchor="w")
-Radiobutton(frame_radio, text="Mujer", variable=sexo, value="Mujer", command=actualizar_roles).pack(anchor="w")
+genero = StringVar(value="Mujer")
 
-Label(root, text="Seleccione roles:", font=("Arial", 12)).pack(anchor="w", padx=10, pady=(10, 0))
+datos_publicador["genero"] = genero
+
+Radiobutton(frame_radio, text="Hombre", variable=genero, value="Hombre", command=actualizar_roles).pack(anchor="w")
+Radiobutton(frame_radio, text="Mujer", variable=genero, value="Mujer", command=actualizar_roles).pack(anchor="w")
+
+
+# ---------- Roles ----------
+Label(root, text="Seleccione roles:", font=("Arial", 12)).grid(row=2, column=0, pady=3)
 
 frame_check = Frame(root)
-frame_check.pack(anchor="w", padx=20)
+frame_check.grid(row=2, column=1, pady=3)
 
 for texto, var in roles.items():
     if texto == "Publicador no bautizado":
@@ -154,4 +192,20 @@ for texto, var in roles.items():
 # Inicializar
 actualizar_roles()
 
+# ---------- Funciones ----------
+def guardar_publicador():
+    print("Guardando publicador...")
+    for propiedad in datos_publicador:
+        print(propiedad, datos_publicador[propiedad].get())
+
+Button(root, text="Guardar", command=guardar_publicador).grid(row=3, column=1, pady=3)
+
 root.mainloop()
+
+
+
+
+
+
+
+
